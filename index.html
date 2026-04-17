@@ -3,12 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong</title>
+    <title>Pong Game</title>
+    <style>
+        canvas {
+            background: black;
+            display: block;
+            margin: 0 auto;
+        }
+        #settings-panel {
+            display: flex;
+            justify-content: center;
+            margin: 1rem;
+        }
+        #settings-panel input {
+            margin: 0 0.5rem;
+        }
+    </style>
 </head>
 <body>
-    <h1>Pong Game</h1>
+    <div id="settings-panel">
+        <label for="player1-speed">Player 1 Speed:</label>
+        <input type="number" id="player1-speed" value="5"><br>
+        <label for="player2-speed">Player 2 Speed:</label>
+        <input type="number" id="player2-speed" value="5"><br>
+        <button id="start-game">Start Game</button>
+    </div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
     <script>
-        // Pong game implementation
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let player1 = { x: 10, y: canvas.height / 2 - 30, width: 10, height: 60, speed: 5 }; 
+        let player2 = { x: canvas.width - 20, y: canvas.height / 2 - 30, width: 10, height: 60, speed: 5 }; 
+        let ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, speedX: 5, speedY: 3 }; 
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
+            ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function update() {
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.speedY = -ball.speedY;
+            }
+
+            if (ball.x + ball.radius > canvas.width) {
+                ball.x = canvas.width / 2;
+                ball.y = canvas.height / 2;
+                ball.speedX = -ball.speedX;
+            }
+            if (ball.x - ball.radius < 0) {
+                ball.x = canvas.width / 2;
+                ball.y = canvas.height / 2;
+                ball.speedX = -ball.speedX;
+            }
+        }
+
+        document.getElementById('start-game').addEventListener('click', () => {
+            player1.speed = parseInt(document.getElementById('player1-speed').value);
+            player2.speed = parseInt(document.getElementById('player2-speed').value);
+            gameLoop();
+        });
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp') {
+                player2.y -= player2.speed;
+            } else if (event.key === 'ArrowDown') {
+                player2.y += player2.speed;
+            }
+            if (event.key === 'w') {
+                player1.y -= player1.speed;
+            } else if (event.key === 's') {
+                player1.y += player1.speed;
+            }
+        });
     </script>
 </body>
 </html>
